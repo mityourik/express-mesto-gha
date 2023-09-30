@@ -36,8 +36,50 @@ const createUser = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
+const updateUserProfile = async (req, res) => {
+  try {
+    const { name, about } = req.body;
+    const updateUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true },
+    );
+
+    if (!updateUser) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    res.status(200).json(updateUser);
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка при обновлении профиля' });
+  }
+};
+
+// eslint-disable-next-line consistent-return
+const updateUserAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка при обновлении аватара' });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
+  updateUserProfile,
+  updateUserAvatar,
 };
