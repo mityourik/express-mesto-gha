@@ -12,7 +12,7 @@ const getAllCards = async (req, res) => {
 const createCard = async (req, res) => {
   try {
     const { name, link } = req.body;
-    const card = new Card({ name, link });
+    const card = new Card({ name, link, owner: req.user._id });
     await card.save();
     res.status(201).json(card);
   } catch (error) {
@@ -38,6 +38,7 @@ const deleteCard = async (req, res) => {
 const likeCard = async (req, res) => {
   try {
     const updatedCard = await Card.findByIdAndUpdate(
+      req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );

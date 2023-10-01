@@ -1,12 +1,12 @@
 const User = require('../models/user');
 
 // ф-я подключения всех пользователей
-const getAllUsers = async (res) => {
+const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: 'сорян пользователи не найдены' });
+    res.status(500).json({ message: 'Ошибка по умолчанию' }); // ?
   }
 };
 
@@ -15,16 +15,21 @@ const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      res.status(404).json({ error: 'нет такого пользователя лол' });
+      res.status(404).json({ message: 'Пользователь по указанному _id не найден' });
       return;
     }
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: 'ошибка при получении пользователя' });
+    if (error.name === 'CastError') {
+      // eslint-disable-next-line consistent-return
+      return res.status(400).json({ message: 'Пользователь по указанному _id не найден' });
+    }
+    res.status(500).json({ message: 'Ошибка по умолчанию.' }); // ?
   }
 };
 
 // ф-я создания нового пользователя
+// eslint-disable-next-line consistent-return
 const createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
@@ -32,7 +37,12 @@ const createUser = async (req, res) => {
     await user.save();
     res.status(201).json(user);
   } catch (error) {
-    res.status(400).json({ error: 'Ошибка при создании пользователя' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: 'Переданы некорректные данные при создании пользователя.',
+      });
+    }
+    res.status(500).json({ message: 'Ошибка по умолчанию' }); // Ошибка по умолчанию?
   }
 };
 
@@ -43,16 +53,19 @@ const updateUserProfile = async (req, res) => {
     const updateUser = await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true },
+      { new: true, runValidators: true }, // включение опции валидации из модели
     );
 
     if (!updateUser) {
-      return res.status(404).json({ error: 'Пользователь не найден' });
+      return res.status(404).json({ message: 'Пользователь с указанным _id не найден.' });
     }
 
     res.status(200).json(updateUser);
   } catch (error) {
-    res.status(500).json({ error: 'Ошибка при обновлении профиля' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Переданы некорректные данные при обновлении профиля.' });
+    }
+    res.status(500).json({ message: 'Ошибка по умолчанию' }); // Ошибка по умолчанию??
   }
 };
 
@@ -63,16 +76,19 @@ const updateUserAvatar = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true },
+      { new: true, runValidators: true }, // включение валидации поля урла для отлова 400
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ error: 'Пользователь не найден' });
+      return res.status(404).json({ message: 'Пользователь с указанным _id не найден.' });
     }
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: 'Ошибка при обновлении аватара' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Переданы некорректные данные при обновлении аватара.' });
+    }
+    res.status(500).json({ message: 'Ошибка по умолчанию' }); // Ошибка по умолчанию??
   }
 };
 
