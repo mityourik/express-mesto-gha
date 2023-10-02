@@ -6,7 +6,7 @@ const getAllCards = async (req, res) => {
     const cards = await Card.find({});
     res.status(200).json(cards);
   } catch (error) {
-    res.status(500).json({ message: 'Ошибка по умолчанию.' });
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -22,7 +22,7 @@ const createCard = async (req, res) => {
       res.status(400).json({ message: 'Переданы некорректные данные при создании карточки.' });
     } else {
       // Все другие ошибки
-      res.status(500).json({ message: 'Ошибка на сервере при создании карточки.' });
+      res.status(500).json({ message: 'На сервере произошла ошибка' });
     }
   }
 };
@@ -44,7 +44,7 @@ const deleteCard = async (req, res) => {
 
     res.status(200).json(card);
   } catch (error) {
-    res.status(500).json({ message: 'Ошибка на сервере при удалении карточки.' });
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -70,7 +70,7 @@ const likeCard = async (req, res) => {
 
     res.status(200).json(updatedCard);
   } catch (error) {
-    res.status(500).json({ message: 'Ошибка по умолчанию.' });
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -96,7 +96,7 @@ const dislikeCard = async (req, res) => {
 
     res.status(200).json(updatedCard);
   } catch (error) {
-    res.status(500).json({ message: 'Ошибка по умолчанию.' });
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 

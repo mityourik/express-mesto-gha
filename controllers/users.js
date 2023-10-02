@@ -6,7 +6,7 @@ const getAllUsers = async (req, res) => {
     const users = await User.find({});
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Ошибка по умолчанию' }); // ?
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -24,7 +24,7 @@ const getUserById = async (req, res) => {
       // eslint-disable-next-line consistent-return
       return res.status(400).json({ message: 'Пользователь по указанному _id не найден' });
     }
-    res.status(500).json({ message: 'Ошибка по умолчанию.' }); // ?
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -42,7 +42,7 @@ const createUser = async (req, res) => {
         message: 'Переданы некорректные данные при создании пользователя.',
       });
     }
-    res.status(500).json({ message: 'Ошибка по умолчанию' }); // Ошибка по умолчанию?
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -65,7 +65,7 @@ const updateUserProfile = async (req, res) => {
     if (error.name === 'ValidationError') {
       return res.status(400).json({ message: 'Переданы некорректные данные при обновлении профиля.' });
     }
-    res.status(500).json({ message: 'Ошибка по умолчанию' }); // Ошибка по умолчанию??
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -88,7 +88,7 @@ const updateUserAvatar = async (req, res) => {
     if (error.name === 'ValidationError') {
       return res.status(400).json({ message: 'Переданы некорректные данные при обновлении аватара.' });
     }
-    res.status(500).json({ message: 'Ошибка по умолчанию' }); // Ошибка по умолчанию??
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 

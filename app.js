@@ -11,9 +11,7 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-  .then(() => console.log('подключено к монгоДБ'))
-  .catch((err) => console.error('Ошибка при подключении к монгоДБ', err));
+});
 
 app.use((req, res, next) => {
   req.user = {
@@ -28,6 +26,4 @@ app.use(usersRouter);
 app.use(cardsRouter);
 app.use(notFoundRouter);
 
-app.listen(PORT, () => {
-  console.log(`чо каво! Запущен на ${PORT}`);
-});
+app.listen(PORT);
