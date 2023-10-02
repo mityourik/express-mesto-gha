@@ -46,37 +46,14 @@ const createUser = async (req, res) => {
   }
 };
 
+// Функция для унификации метода findByIdAnUpdate
 // eslint-disable-next-line consistent-return
-const updateUserProfile = async (req, res) => {
+const updateUser = async (req, res, updateData) => {
   try {
-    const { name, about } = req.body;
-    const updateUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, about },
-      { new: true, runValidators: true }, // включение опции валидации из модели
-    );
-
-    if (!updateUser) {
-      return res.status(404).json({ message: 'Пользователь с указанным _id не найден.' });
-    }
-
-    res.status(200).json(updateUser);
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: 'Переданы некорректные данные при обновлении профиля.' });
-    }
-    res.status(500).json({ message: 'На сервере произошла ошибка' });
-  }
-};
-
-// eslint-disable-next-line consistent-return
-const updateUserAvatar = async (req, res) => {
-  try {
-    const { avatar } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      { avatar },
-      { new: true, runValidators: true }, // включение валидации поля урла для отлова 400
+      updateData,
+      { new: true, runValidators: true },
     );
 
     if (!updatedUser) {
@@ -86,10 +63,24 @@ const updateUserAvatar = async (req, res) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: 'Переданы некорректные данные при обновлении аватара.' });
+      return res.status(400).json({ message: 'Переданы некорректные данные в поле.' });
     }
     res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
+};
+
+// Функция для обновления профиля
+const updateUserProfile = async (req, res) => {
+  const { name, about } = req.body;
+  const updateData = { name, about };
+  updateUser(req, res, updateData);
+};
+
+// Функция для обновления аватара
+const updateUserAvatar = async (req, res) => {
+  const { avatar } = req.body;
+  const updateData = { avatar };
+  updateUser(req, res, updateData);
 };
 
 module.exports = {
