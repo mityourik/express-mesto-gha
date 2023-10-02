@@ -32,19 +32,16 @@ const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
 
-    // Проверка валидности идентификатора
     if (!mongoose.Types.ObjectId.isValid(cardId)) {
       return res.status(400).json({ message: 'Неверный идентификатор карточки.' });
     }
 
-    const card = await Card.findById(cardId);
+    const card = await Card.findByIdAndDelete(cardId); // метод удаления по id
 
-    // Проверка существования карточки
     if (!card) {
       return res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
     }
 
-    await card.remove();
     res.status(200).json(card);
   } catch (error) {
     res.status(500).json({ message: 'Ошибка на сервере при удалении карточки.' });
