@@ -5,7 +5,7 @@ const getAllCards = async (req, res) => {
     const cards = await Card.find({});
     res.status(200).json(cards);
   } catch (error) {
-    res.status(500).json({ error: 'ошибка при получении карточек' });
+    res.status(500).json({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -16,7 +16,13 @@ const createCard = async (req, res) => {
     await card.save();
     res.status(201).json(card);
   } catch (error) {
-    res.status(400).json({ error: 'Ошибка при создании карточки' });
+    if (error.name === 'ValidationError') {
+      // Ошибка валидации
+      res.status(400).json({ message: 'Переданы некорректные данные при создании карточки.' });
+    } else {
+      // Все другие ошибки
+      res.status(500).json({ message: 'Ошибка на сервере при создании карточки.' });
+    }
   }
 };
 
@@ -24,13 +30,13 @@ const deleteCard = async (req, res) => {
   try {
     const card = await Card.findById(req.params.cardId);
     if (!card) {
-      res.status(404).json({ error: 'карточка не найдена' });
+      res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
       return;
     }
     await card.remove();
     res.status(200).json(card);
   } catch (error) {
-    res.status(500).json({ error: 'ошибка при удалении карточки' });
+    res.status(500).json({ message: 'Ошибка на сервере при удалении карточки.' });
   }
 };
 
@@ -44,12 +50,12 @@ const likeCard = async (req, res) => {
     );
 
     if (!updatedCard) {
-      return res.status(404).json({ error: 'Карточка не найдена' });
+      return res.status(404).json({ message: 'Передан несуществующий _id карточки.' });
     }
 
     res.status(200).json(updatedCard);
   } catch (error) {
-    res.status(500).json({ error: 'Ошибка при постановке лайка' });
+    res.status(500).json({ message: 'Ошибка по умолчанию.' }); // по умолчанию??
   }
 };
 
@@ -63,12 +69,12 @@ const dislikeCard = async (req, res) => {
     );
 
     if (!updatedCard) {
-      return res.status(404).json({ error: 'Карточка не найдена' });
+      return res.status(404).json({ message: 'Передан несуществующий _id карточки.' });
     }
 
     res.status(200).json(updatedCard);
   } catch (error) {
-    res.status(500).json({ error: 'ошибка при удалении лайка' });
+    res.status(500).json({ message: 'Ошибка по умолчанию.' });
   }
 };
 

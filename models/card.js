@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -10,6 +11,10 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: (value) => validator.isURL(value), // Проверка URL с помощью validator
+      message: 'Неверный формат URL', // Сообщение об ошибке, если URL невалидный
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,6 +30,8 @@ const cardSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+}, {
+  versionKey: false, // убрал создание поля ключа версии записи в монго
 });
 
 module.exports = mongoose.model('card', cardSchema);
