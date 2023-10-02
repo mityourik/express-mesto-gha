@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 const getAllCards = async (req, res) => {
@@ -26,13 +27,23 @@ const createCard = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 const deleteCard = async (req, res) => {
   try {
-    const card = await Card.findById(req.params.cardId);
-    if (!card) {
-      res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
-      return;
+    const { cardId } = req.params;
+
+    // Проверка валидности идентификатора
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(400).json({ message: 'Неверный идентификатор карточки.' });
     }
+
+    const card = await Card.findById(cardId);
+
+    // Проверка существования карточки
+    if (!card) {
+      return res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
+    }
+
     await card.remove();
     res.status(200).json(card);
   } catch (error) {
@@ -43,8 +54,15 @@ const deleteCard = async (req, res) => {
 // eslint-disable-next-line consistent-return
 const likeCard = async (req, res) => {
   try {
+    const { cardId } = req.params;
+
+    // Проверка валидности идентификатора
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(400).json({ message: 'Неверный идентификатор карточки.' });
+    }
+
     const updatedCard = await Card.findByIdAndUpdate(
-      req.params.cardId,
+      cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
@@ -55,15 +73,22 @@ const likeCard = async (req, res) => {
 
     res.status(200).json(updatedCard);
   } catch (error) {
-    res.status(500).json({ message: 'Ошибка по умолчанию.' }); // по умолчанию??
+    res.status(500).json({ message: 'Ошибка по умолчанию.' });
   }
 };
 
 // eslint-disable-next-line consistent-return
 const dislikeCard = async (req, res) => {
   try {
+    const { cardId } = req.params;
+
+    // Проверка валидности идентификатора
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(400).json({ message: 'Неверный идентификатор карточки.' });
+    }
+
     const updatedCard = await Card.findByIdAndUpdate(
-      req.params.cardId,
+      cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
     );
