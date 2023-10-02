@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const notFoundRouter = require('./routes/notFoundPages');
 
 const { PORT = 3000 } = process.env;
 
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(usersRouter);
 app.use(cardsRouter);
+app.use(notFoundRouter);
 
 app.listen(PORT, () => {
   console.log(`чо каво! Запущен на ${PORT}`);
