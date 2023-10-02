@@ -3,12 +3,11 @@ const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const notFoundRouter = require('./routes/notFoundPages');
-
-const { PORT = 3000 } = process.env;
+const config = require('./config');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(config.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -26,4 +25,6 @@ app.use(usersRouter);
 app.use(cardsRouter);
 app.use(notFoundRouter);
 
-app.listen(PORT);
+app.listen(config.PORT, () => {
+  console.log(`чо каво! Запущен на ${config.PORT}`);
+});
