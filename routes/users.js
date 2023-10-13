@@ -17,7 +17,7 @@ router.post('/signup', createUser);
 
 router.use(auth);
 
-router.get('/users/me',  getUserInfo);
+router.get('/users/me', getUserInfo);
 router.get('/users', getAllUsers);
 router.get('/users/:userId', getUserById);
 router.patch('/users/me', updateUserProfile);

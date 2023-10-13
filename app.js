@@ -18,6 +18,4 @@ app.use(usersRouter);
 app.use(cardsRouter);
 app.use(notFoundRouter);
 
-app.listen(PORT, () => {
-  console.log(PORT);
-});
+app.listen(PORT);
