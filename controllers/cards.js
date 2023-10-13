@@ -46,10 +46,30 @@ const createCard = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 const deleteCard = async (req, res) => {
-  const requestFunc = (cardId) => Card.findByIdAndDelete(cardId);
-  const errorMessage = 'Карточка с указанным _id не найдена.';
-  handleCardRequest(req, res, requestFunc, errorMessage);
+  try {
+    const { cardId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(400).json({ message: 'Неверный идентификатор карточки' });
+    }
+
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
+    }
+
+    if (card.owner.toString() !== req.user._id) {
+      return res.status(403).json({ message: 'Недостаточно прав для удаления карточки' });
+    }
+
+    await Card.findByIdAndDelete(cardId);
+    res.status(200).json({ message: 'Карточка удалена' });
+  } catch (error) {
+    res.status(500).json({ message: 'На сервере произошла ошибка' });
+  }
 };
 
 const likeCard = async (req, res) => {
