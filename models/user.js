@@ -7,14 +7,14 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 2,
     maxlength: 30,
-    default: 'Жак-Ив Кусто', // Станд значение для инпута name
+    default: 'Жак-Ив Кусто', // Станд значение для инпута
   },
   about: {
     type: String,
     required: true,
     minlength: 2,
     maxlength: 30,
-    default: 'Исследователь', // Станд значение для инпута name
+    default: 'Исследователь', // Станд значение для инпута
   },
   avatar: {
     type: String,
