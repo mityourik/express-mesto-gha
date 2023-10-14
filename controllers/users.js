@@ -3,36 +3,32 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
 // ф-я подключения всех пользователей
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: 'На сервере произошла ошибка' });
+    next(error);
   }
 };
 
 // ф-я получения пользователя по id
-const getUserById = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      res.status(404).json({ message: 'Пользователь по указанному _id не найден' });
-      return;
+      return next({ status: 404, message: 'Пользователь по указанному _id не найден' });
     }
     res.status(200).json(user);
   } catch (error) {
-    if (error.name === 'CastError') {
-      // eslint-disable-next-line consistent-return
-      return res.status(400).json({ message: 'Пользователь по указанному _id не найден' });
-    }
-    res.status(500).json({ message: 'На сервере произошла ошибка' });
+    next(error);
   }
 };
 
 // ф-я создания нового пользователя
 // eslint-disable-next-line consistent-return
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
     const {
       name,
@@ -41,9 +37,7 @@ const createUser = async (req, res) => {
       email,
       password,
     } = req.body;
-
-    const hashedPassword = await bcrypt.hash(password, 10); // хеширование пароля
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       name,
       about,
@@ -51,97 +45,74 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
     });
-
     await user.save();
-    res.status(201).json({
-      name: user.name,
-      email: user.email,
-    });
+    res.status(201).json({ name: user.name, email: user.email });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные при создании пользователя.',
-      });
-    } if (error.code === 11000) {
-      res.status(409).json({ message: 'Пользователь с таким email уже зарегистрирован' });
-    }
-    res.status(500).json({ message: 'На сервере произошла ошибка' });
+    next(error);
   }
 };
 
 // Функция для унификации метода findByIdAnUpdate
 // eslint-disable-next-line consistent-return
-const updateUser = async (req, res, updateData) => {
+const updateUser = async (req, res, next, updateData) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      updateData,
-      { new: true, runValidators: true },
-    );
-
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
+      new: true,
+      runValidators: true,
+    });
     if (!updatedUser) {
-      return res.status(404).json({ message: 'Пользователь с указанным _id не найден.' });
+      return next({ status: 404, message: 'Пользователь с указанным _id не найден.' });
     }
-
     res.status(200).json(updatedUser);
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: 'Переданы некорректные данные в поле.' });
-    }
-    res.status(500).json({ message: 'На сервере произошла ошибка' });
+    next(error);
   }
 };
 
 // Функция для обновления профиля
-const updateUserProfile = async (req, res) => {
+const updateUserProfile = async (req, res, next) => {
   const { name, about } = req.body;
   const updateData = { name, about };
-  updateUser(req, res, updateData);
+  updateUser(req, res, next, updateData);
 };
 
 // Функция для обновления аватара
-const updateUserAvatar = async (req, res) => {
+const updateUserAvatar = async (req, res, next) => {
   const { avatar } = req.body;
   const updateData = { avatar };
-  updateUser(req, res, updateData);
+  updateUser(req, res, next, updateData);
 };
 
 // Ф-я для логина
-const login = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
-
     if (!user || !await bcrypt.compare(password, user.password)) {
-      throw new Error();
+      return next({ status: 401, message: 'Неверный логин или пароль' });
     }
-
-    const token = jwt.sign(
-      { _id: user._id },
-      'some-secret-key',
-      { expiresIn: '7d' },
-    );
-
+    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
     res.cookie('jwt', token, {
       httpOnly: true,
       sameSite: true,
       maxAge: 3600000 * 24 * 7,
-    }).status(200).send({ message: 'Вы успешно авторизировались!' });
+    }).status(200).json({ message: 'Вы успешно авторизировались!' });
   } catch (error) {
-    res.status(401).json({ message: 'Неверный логин или пароль' });
+    next(error);
   }
 };
 
-const getUserInfo = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const getUserInfo = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      res.status(404).json({ message: 'Пользователь найден' });
-      return;
+      return next({ status: 404, message: 'Пользователь не найден' });
     }
     res.send({ data: user });
   } catch (error) {
-    res.status(500).json({ message: 'На сервере произошла ошибка' });
+    next(error);
   }
 };
 

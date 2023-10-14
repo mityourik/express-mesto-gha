@@ -4,7 +4,7 @@ const auth = (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     if (!token) {
-      throw new Error();
+      throw new Error('Токен не получен епт');
     }
 
     const payload = jwt.verify(token, 'some-secret-key');
@@ -13,7 +13,10 @@ const auth = (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(401).send({ message: 'Необходима авторизация' });
+    next({
+      status: 401,
+      message: error.message || 'Необходима авторизация',
+    });
   }
 };
 

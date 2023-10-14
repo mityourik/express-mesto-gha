@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const notFoundRouter = require('./routes/notFoundPages');
+const { errorHandler } = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 
@@ -17,5 +18,6 @@ app.use(express.json());
 app.use(usersRouter);
 app.use(cardsRouter);
 app.use(notFoundRouter);
+app.use(errorHandler);
 
 app.listen(PORT);
