@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
       validator: (value) => validator.isURL(value), // Проверка URL с помощью validator
       message: 'Неверный формат URL', // Сообщение об ошибке, если URL невалидный
     },
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png', // станд аватар
   },
   email: {
     type: String,
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    select: false, // необходимо добавить поле select
+    select: false,
   },
 }, {
   versionKey: false, // убрал создание поля ключа версии записи в монго

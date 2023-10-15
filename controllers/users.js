@@ -1,3 +1,4 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
@@ -88,15 +89,22 @@ const updateUserAvatar = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email }).select('+password');
+
     if (!user || !await bcrypt.compare(password, user.password)) {
-      return next({ status: 401, message: 'Неверный логин или пароль' });
+      const error = new Error('Неверный логин или пароль');
+      error.status = 401;
+      return next(error);
     }
-    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
     res.cookie('jwt', token, {
       httpOnly: true,
       sameSite: true,
       maxAge: 3600000 * 24 * 7,
+      secure: process.env.NODE_ENV === 'production',
     }).status(200).json({ message: 'Вы успешно авторизировались!' });
   } catch (error) {
     next(error);
