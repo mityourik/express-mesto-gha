@@ -30,7 +30,6 @@ const getUserById = async (req, res, next) => {
 // ф-я создания нового пользователя
 // eslint-disable-next-line consistent-return
 const createUser = async (req, res, next) => {
-  console.log('createUser is on');
   try {
     const {
       name,
@@ -48,9 +47,13 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
     await user.save();
-    res.status(201).json({ user });
+    res.status(201).json({
+      name,
+      about,
+      avatar,
+      email,
+    });
   } catch (error) {
-    console.log('catch block is on');
     next(error);
   }
 };
