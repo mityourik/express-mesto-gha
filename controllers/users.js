@@ -98,7 +98,7 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || !await bcrypt.compare(password, user.password)) {
-      const error = new Error('Неверный логин или пароль');
+      const error = new Error();
       error.status = 401;
       return next(error);
     }
