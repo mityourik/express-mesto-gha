@@ -1,4 +1,4 @@
-[![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
+[![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
 # Проектная работа: Mesto (Backend)
 
 Что посмотреть мою работу кликни тут: https://github.com/mityourik/express-mesto-gha
@@ -13,6 +13,9 @@
 - Работа с базой данных MongoDB.
 - Валидация запросов и данных.
 - Обработка ошибок и возврат соответствующих ответов.
+- Авторизация и аутентификация пользователя
+- Отлов ошибок при помощи celebrate
+- Унификация и обработка ошибок в мидлваре
 
 ## Содержание
 
