@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const router = require('./routes');
 const { handleValidationErrors } = require('./middlewares/errorsHandler');
 
@@ -13,6 +14,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(router);
 
 app.use(handleValidationErrors);

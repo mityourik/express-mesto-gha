@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.cookies && req.cookies.jwt;
     if (!token) {
       throw new Error('Токен не получен епт');
     }
@@ -15,8 +15,7 @@ const auth = (req, res, next) => {
 
     next();
   } catch (error) {
-    next({
-      status: 401,
+    res.status(401).json({
       message: error.message || 'Необходима авторизация',
     });
   }

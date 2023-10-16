@@ -48,7 +48,7 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
     await user.save();
-    res.status(201).json({ name: user.name, email: user.email });
+    res.status(201).json({ user });
   } catch (error) {
     console.log('catch block is on');
     next(error);
@@ -118,9 +118,13 @@ const getUserInfo = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      return next({ status: 404, message: 'Пользователь не найден' });
+      throw new Error('Пользователь не найден');
     }
-    res.send({ data: user });
+
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.status(200).json(userData);
   } catch (error) {
     next(error);
   }
