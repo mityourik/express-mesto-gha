@@ -8,11 +8,12 @@ const {
   updateUserAvatar,
   getUserInfo,
 } = require('../controllers/users');
+const { getUserByIdSchema, updateUserProfileSchema, updateUserAvatarSchema } = require('../errors/joiValidationSchema');
 
 router.get('/users/me', getUserInfo);
 router.get('/users', getAllUsers);
-router.get('/users/:userId', getUserById);
-router.patch('/users/me', updateUserProfile);
-router.patch('/users/me/avatar', updateUserAvatar);
+router.get('/users/:userId', getUserByIdSchema, getUserById);
+router.patch('/users/me', updateUserProfileSchema, updateUserProfile);
+router.patch('/users/me/avatar', updateUserAvatarSchema, updateUserAvatar);
 
 module.exports = router;
