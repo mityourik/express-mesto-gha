@@ -4,7 +4,7 @@ const auth = require('../middlewares/auth');
 const usersRouter = require('./users');
 const cardsRouter = require('./cards');
 const notFoundRouter = require('./notFoundPages');
-const { createUserSchema, loginSchema } = require('../errors/joiValidationSchema');
+const { createUserSchema, loginSchema } = require('../validationSchemas/joiValidationSchemas');
 
 const router = Router();
 

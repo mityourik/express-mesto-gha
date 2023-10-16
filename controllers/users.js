@@ -2,12 +2,18 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const {
+  HTTP_STATUS_OK,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_UNAUTHORIZED,
+} = require('../utils/httpStatuses');
 
 // ф-я подключения всех пользователей
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    res.status(200).json(users);
+    res.status(HTTP_STATUS_OK).json(users);
   } catch (error) {
     next(error);
   }
@@ -19,9 +25,9 @@ const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      return next({ status: 404, message: 'Пользователь по указанному _id не найден' });
+      return next({ status: HTTP_STATUS_NOT_FOUND, message: 'Пользователь по указанному _id не найден' });
     }
-    res.status(200).json(user);
+    res.status(HTTP_STATUS_OK).json(user);
   } catch (error) {
     next(error);
   }
@@ -47,7 +53,7 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
     await user.save();
-    res.status(201).json({
+    res.status(HTTP_STATUS_CREATED).json({
       name,
       about,
       avatar,
@@ -67,7 +73,7 @@ const updateUser = async (req, res, next, updateData) => {
       runValidators: true,
     });
     if (!updatedUser) {
-      return next({ status: 404, message: 'Пользователь с указанным _id не найден.' });
+      return next({ status: HTTP_STATUS_NOT_FOUND, message: 'Пользователь с указанным _id не найден.' });
     }
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -99,7 +105,7 @@ const login = async (req, res, next) => {
 
     if (!user || !await bcrypt.compare(password, user.password)) {
       const error = new Error();
-      error.status = 401;
+      error.status = HTTP_STATUS_UNAUTHORIZED;
       return next(error);
     }
 
@@ -110,7 +116,7 @@ const login = async (req, res, next) => {
       sameSite: true,
       maxAge: 3600000 * 24 * 7,
       secure: process.env.NODE_ENV === 'production',
-    }).status(200).json({ message: 'Вы успешно авторизировались!' });
+    }).status(HTTP_STATUS_OK).json({ message: 'Вы успешно авторизировались!' });
   } catch (error) {
     next(error);
   }
@@ -127,7 +133,7 @@ const getUserInfo = async (req, res, next) => {
     const userData = user.toObject();
     delete userData.password;
 
-    res.status(200).json(userData);
+    res.status(HTTP_STATUS_OK).json(userData);
   } catch (error) {
     next(error);
   }

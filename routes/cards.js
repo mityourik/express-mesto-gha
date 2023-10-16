@@ -12,7 +12,7 @@ const {
   likeCardSchema,
   dislikeCardSchema,
   deleteCardSchema,
-} = require('../errors/joiValidationSchema');
+} = require('../validationSchemas/joiValidationSchemas');
 
 const router = express.Router();
 

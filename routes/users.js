@@ -8,7 +8,7 @@ const {
   updateUserAvatar,
   getUserInfo,
 } = require('../controllers/users');
-const { getUserByIdSchema, updateUserProfileSchema, updateUserAvatarSchema } = require('../errors/joiValidationSchema');
+const { getUserByIdSchema, updateUserProfileSchema, updateUserAvatarSchema } = require('../validationSchemas/joiValidationSchemas');
 
 router.get('/users/me', getUserInfo);
 router.get('/users', getAllUsers);
