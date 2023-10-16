@@ -4,12 +4,13 @@ const auth = require('../middlewares/auth');
 const usersRouter = require('./users');
 const cardsRouter = require('./cards');
 const notFoundRouter = require('./notFoundPages');
+const validate = require('../middlewares/joiValidation');
 const { createUserSchema, loginSchema } = require('../utils/validationScheme');
 
 const router = Router();
 
-router.post('/signup', createUserSchema, createUser);
-router.post('/signin', loginSchema, login);
+router.post('/signup', validate(createUserSchema), createUser);
+router.post('/signin', validate(loginSchema), login);
 
 router.use(auth);
 

@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { errors } = require('celebrate');
 const router = require('./routes');
 const { handleValidationErrors } = require('./middlewares/errorsHandler');
 
@@ -17,7 +16,6 @@ app.use(express.json());
 app.use(router);
 
 app.use(handleValidationErrors);
-app.use(errors());
 
 app.listen(PORT, () => {
   console.log(`На порте: ${PORT}`);
