@@ -14,14 +14,14 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 2,
     maxlength: 30,
-    default: 'Исследователь океана', // Станд значение для инпута
+    default: 'Исследователь', // Станд значение для инпута
   },
   avatar: {
     type: String,
     required: true,
     validate: {
-      validator: (value) => validator.isURL(value), // Проверка URL с помощью validator
-      message: 'Неверный формат URL', // Сообщение об ошибке, если URL невалидный
+      validator: (value) => validator.isURL(value),
+      message: 'Неверный формат URL',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png', // станд аватар
   },
