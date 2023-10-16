@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const celebrateErrorHandler = require('./middlewares/celebrateErrorHadler');
 const router = require('./routes');
+const { errorsHandler } = require('./middlewares/errorsHadler');
 
 const { PORT = 3000 } = process.env;
 
@@ -18,6 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(router);
 app.use(errors());
+app.use(errorsHandler);
 
 app.listen(PORT, () => {
   console.log(`На порте: ${PORT}`);
