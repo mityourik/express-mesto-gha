@@ -4,8 +4,8 @@ const urlRegex = /https?:\/\/(www\.)?[\w-]+(\.\w+)+([/\w-._~:?#[\]@!$&'()*+,;=]+
 
 const createUserSchema = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).max(30).required(),
+    name: Joi.string().min(3).max(30).required(),
+    about: Joi.string().min(3).max(30).required(),
     avatar: Joi.string().regex(urlRegex).required(),
     email: Joi.string().required().email(),
     password: Joi.string().min(6).required(),

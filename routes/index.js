@@ -13,10 +13,8 @@ router.post('/signin', loginSchema, login);
 
 router.use(auth);
 
-router.use(auth);
-
-router.use('/users', usersRouter);
-router.use('/cards', cardsRouter);
+router.use(usersRouter);
+router.use(cardsRouter);
 router.use(notFoundRouter);
 
 module.exports = router;

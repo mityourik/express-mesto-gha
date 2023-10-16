@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
@@ -7,7 +9,7 @@ const auth = (req, res, next) => {
       throw new Error('Токен не получен епт');
     }
 
-    const payload = jwt.verify(token, 'some-secret-key');
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = payload;
 
