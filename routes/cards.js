@@ -7,13 +7,19 @@ const {
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
+const {
+  createCardSchema,
+  likeCardSchema,
+  dislikeCardSchema,
+  deleteCardSchema,
+} = require('../errors/joiValidationSchema');
 
 const router = express.Router();
 
 router.get('/cards', getAllCards);
-router.post('/cards', createCard);
-router.delete('/cards/:cardId', deleteCard);
-router.put('/cards/:cardId/likes', likeCard);
-router.delete('/cards/:cardId/likes', dislikeCard);
+router.post('/cards', createCardSchema, createCard);
+router.delete('/cards/:cardId', deleteCardSchema, deleteCard);
+router.put('/cards/:cardId/likes', likeCardSchema, likeCard);
+router.delete('/cards/:cardId/likes', dislikeCardSchema, dislikeCard);
 
 module.exports = router;

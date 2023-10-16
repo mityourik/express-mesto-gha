@@ -38,10 +38,39 @@ const updateUserAvatarSchema = celebrate({
   }),
 });
 
+const createCardSchema = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    link: Joi.string().pattern(urlRegex).required(),
+  }),
+});
+
+const likeCardSchema = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex().required(),
+  }),
+});
+
+const dislikeCardSchema = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex().required(),
+  }),
+});
+
+const deleteCardSchema = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex().required(),
+  }),
+});
+
 module.exports = {
   createUserSchema,
   loginSchema,
   getUserByIdSchema,
   updateUserProfileSchema,
   updateUserAvatarSchema,
+  createCardSchema,
+  likeCardSchema,
+  dislikeCardSchema,
+  deleteCardSchema,
 };
