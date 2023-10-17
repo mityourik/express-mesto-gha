@@ -98,24 +98,24 @@ const deleteCard = async (req, res, next) => {
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   const requestFunc = (cardId) => Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   );
   const errorMessage = 'Передан несуществующий _id карточки.';
-  handleCardRequest(req, res, requestFunc, errorMessage);
+  handleCardRequest(req, res, next, requestFunc, errorMessage);
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   const requestFunc = (cardId) => Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   );
   const errorMessage = 'Передан несуществующий _id карточки.';
-  handleCardRequest(req, res, requestFunc, errorMessage);
+  handleCardRequest(req, res, next, requestFunc, errorMessage);
 };
 
 module.exports = {
