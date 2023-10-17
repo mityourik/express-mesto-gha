@@ -3,6 +3,7 @@ const {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CONFLICT,
   HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_UNAUTHORIZED,
 } = require('../utils/httpStatuses');
 
 // eslint-disable-next-line no-unused-vars
@@ -24,6 +25,8 @@ const errorsHandler = (err, req, res, next) => {
       message = 'Пользователь не найден!';
     } else if (statusCode === HTTP_STATUS_BAD_REQUEST) {
       message = 'Неверный логин или пароль';
+    } else if (statusCode === HTTP_STATUS_UNAUTHORIZED) {
+      message = 'Необходима авторизация';
     }
   }
 
