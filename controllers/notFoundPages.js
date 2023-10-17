@@ -1,5 +1,8 @@
-const handleNotFound = (req, res) => {
-  res.status(404).json({ message: 'Запрашиваемая страница не найдена.' });
+const NotFoundError = require('../errors/NotFoundError');
+
+const handleNotFound = (req, res, next) => {
+  const notFoundError = new NotFoundError('Запрашиваемая страница не найдена.');
+  return next(notFoundError);
 };
 
 module.exports = handleNotFound;

@@ -13,6 +13,11 @@ router.post('/signin', loginSchema, login);
 
 router.use(auth);
 
+// Роут для выхода
+router.get('/signout', (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Выход' });
+});
+
 router.use(usersRouter);
 router.use(cardsRouter);
 router.use(notFoundRouter);

@@ -4,21 +4,18 @@ const validator = require('validator');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
     default: 'Жак-Ив Кусто', // Станд значение для инпута
   },
   about: {
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
     default: 'Исследователь', // Станд значение для инпута
   },
   avatar: {
     type: String,
-    required: true,
     validate: {
       validator: (value) => validator.isURL(value),
       message: 'Неверный формат URL',

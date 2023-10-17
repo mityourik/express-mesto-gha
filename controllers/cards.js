@@ -1,51 +1,47 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_FORBIDDEN,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
 } = require('../utils/httpStatuses');
+const NotFoundError = require('../errors/NotFoundError');
+const InternalServerError = require('../errors/InternalServerError');
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-// eslint-disable-next-line consistent-return
 const handleCardRequest = async (req, res, next, requestFunc, errorMessage) => {
   try {
     const { cardId } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(cardId)) {
-      const error = new Error('Неверный идентификатор карточки');
-      error.status = HTTP_STATUS_BAD_REQUEST;
-      return next(error);
-    }
-
     const result = await requestFunc(cardId);
 
-    if (!result) {
-      const error = new Error(errorMessage);
-      error.status = HTTP_STATUS_NOT_FOUND;
-      return next(error);
+    if (!cardId) {
+      const badRequestError = new BadRequestError(errorMessage);
+      return next(badRequestError);
     }
 
-    res.status(HTTP_STATUS_OK).json(result);
+    if (!result) {
+      const notFoundError = new NotFoundError(errorMessage);
+      return next(notFoundError);
+    }
+
+    res.status(HTTP_STATUS_OK).json(result); // tut
   } catch (error) {
-    error.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
-    next(error);
+    const internalError = new InternalServerError(errorMessage);
+    next(internalError);
   }
+
+  return undefined;
 };
 
 const getAllCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
-    res.status(HTTP_STATUS_OK).json(cards);
+    res.status(HTTP_STATUS_OK).json(cards); // tut
   } catch (error) {
-    error.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
-    next(error);
+    const internalError = new InternalServerError('Ошибка на сервере');
+    next(internalError);
   }
 };
 
-// eslint-disable-next-line consistent-return
 const createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
@@ -54,48 +50,45 @@ const createCard = async (req, res, next) => {
     res.status(HTTP_STATUS_CREATED).json(card);
   } catch (error) {
     if (error.name === 'ValidationError') {
-      const validationError = new Error('Переданы некорректные данные при создании карточки.');
-      validationError.status = HTTP_STATUS_BAD_REQUEST;
+      const validationError = new BadRequestError('Переданы некорректные данные при создании карточки.');
       return next(validationError);
     }
-    const internalError = new Error('На сервере произошла ошибка');
-    internalError.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
+    const internalError = new InternalServerError('На сервере произошла ошибка');
     return next(internalError);
   }
+
+  return undefined;
 };
 
-// eslint-disable-next-line consistent-return
 const deleteCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(cardId)) {
-      const badRequestError = new Error('Неверный идентификатор карточки');
-      badRequestError.status = HTTP_STATUS_BAD_REQUEST;
+    if (!cardId) {
+      const badRequestError = new BadRequestError('Неверный идентификатор карточки');
       return next(badRequestError);
     }
 
     const card = await Card.findById(cardId);
 
     if (!card) {
-      const notFoundError = new Error('Карточка с указанным _id не найдена.');
-      notFoundError.status = HTTP_STATUS_NOT_FOUND;
+      const notFoundError = new NotFoundError('Карточка с указанным _id не найдена.');
       return next(notFoundError);
     }
 
     if (card.owner.toString() !== req.user._id) {
-      const forbiddenError = new Error('Недостаточно прав для удаления карточки');
-      forbiddenError.status = HTTP_STATUS_FORBIDDEN;
+      const forbiddenError = new ForbiddenError('Недостаточно прав для удаления карточки');
       return next(forbiddenError);
     }
 
     await Card.findByIdAndDelete(cardId);
     res.status(HTTP_STATUS_OK).json({ message: 'Карточка удалена' });
   } catch (error) {
-    const internalError = new Error('На сервере произошла ошибка');
-    internalError.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
+    const internalError = new InternalServerError('На сервере произошла ошибка');
     return next(internalError);
   }
+
+  return undefined;
 };
 
 const likeCard = async (req, res, next) => {

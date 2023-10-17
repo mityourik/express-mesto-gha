@@ -5,9 +5,10 @@ const User = require('../models/user');
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_UNAUTHORIZED,
 } = require('../utils/httpStatuses');
+const NotFoundError = require('../errors/NotFoundError');
+const InternalServerError = require('../errors/InternalServerError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 // ф-я подключения всех пользователей
 const getAllUsers = async (req, res, next) => {
@@ -15,26 +16,30 @@ const getAllUsers = async (req, res, next) => {
     const users = await User.find({});
     res.status(HTTP_STATUS_OK).json(users);
   } catch (error) {
-    next(error);
+    const internalError = new InternalServerError('Ошибка на сервере');
+    return next(internalError);
   }
+
+  return undefined;
 };
 
 // ф-я получения пользователя по id
-// eslint-disable-next-line consistent-return
 const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      return next({ status: HTTP_STATUS_NOT_FOUND, message: 'Пользователь по указанному _id не найден' });
+      const notFoundError = new NotFoundError('Пользователь по указанному _id не найден');
+      return next(notFoundError);
     }
     res.status(HTTP_STATUS_OK).json(user);
   } catch (error) {
     next(error);
   }
+
+  return undefined;
 };
 
 // ф-я создания нового пользователя
-// eslint-disable-next-line consistent-return
 const createUser = async (req, res, next) => {
   try {
     const {
@@ -65,7 +70,6 @@ const createUser = async (req, res, next) => {
 };
 
 // Функция для унификации метода findByIdAnUpdate
-// eslint-disable-next-line consistent-return
 const updateUser = async (req, res, next, updateData) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
@@ -73,12 +77,15 @@ const updateUser = async (req, res, next, updateData) => {
       runValidators: true,
     });
     if (!updatedUser) {
-      return next({ status: HTTP_STATUS_NOT_FOUND, message: 'Пользователь с указанным _id не найден.' });
+      const notFoundError = new NotFoundError('Пользователь с указанным _id не найден.');
+      return next(notFoundError);
     }
     res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
   }
+
+  return undefined;
 };
 
 // Функция для обновления профиля
@@ -96,7 +103,6 @@ const updateUserAvatar = async (req, res, next) => {
 };
 
 // Ф-я для логина
-// eslint-disable-next-line consistent-return
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -104,9 +110,8 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || !await bcrypt.compare(password, user.password)) {
-      const error = new Error();
-      error.status = HTTP_STATUS_UNAUTHORIZED;
-      return next(error);
+      const unauthorizedError = new UnauthorizedError('Неверный логин или пароль');
+      return next(unauthorizedError);
     }
 
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -120,14 +125,16 @@ const login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+
+  return undefined;
 };
 
-// eslint-disable-next-line consistent-return
 const getUserInfo = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      throw new Error('Пользователь не найден');
+      const notFoundError = new NotFoundError('Пользователь не найден');
+      return next(notFoundError);
     }
 
     const userData = user.toObject();
@@ -137,6 +144,8 @@ const getUserInfo = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+
+  return undefined;
 };
 
 module.exports = {
