@@ -1,5 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+
+const jwtSecret = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'some-secret-key';
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const auth = (req, res, next) => {
@@ -10,7 +12,7 @@ const auth = (req, res, next) => {
       return next(unauthorizedError);
     }
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, jwtSecret);
 
     req.user = payload;
 
