@@ -9,6 +9,7 @@ const {
 const NotFoundError = require('../errors/NotFoundError');
 const InternalServerError = require('../errors/InternalServerError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const ConflictError = require('../errors/ConflictError');
 
 // ф-я подключения всех пользователей
 const getAllUsers = async (req, res, next) => {
@@ -49,6 +50,14 @@ const createUser = async (req, res, next) => {
       email,
       password,
     } = req.body;
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      const conflictError = new ConflictError('Пользователь с таким email уже существует.');
+      return next(conflictError);
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       name,
@@ -59,14 +68,16 @@ const createUser = async (req, res, next) => {
     });
     await user.save();
     res.status(HTTP_STATUS_CREATED).json({
-      name,
-      about,
-      avatar,
-      email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
     });
   } catch (error) {
     next(error);
   }
+
+  return undefined;
 };
 
 // Функция для унификации метода findByIdAnUpdate
