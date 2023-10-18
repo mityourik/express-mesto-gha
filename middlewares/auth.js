@@ -4,24 +4,22 @@ const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'some-secret-key';
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
   try {
     const token = req.cookies && req.cookies.jwt;
     if (!token) {
-      const unauthorizedError = new UnauthorizedError('Токен не получен');
+      const unauthorizedError = new UnauthorizedError('Необходима авторизация');
       return next(unauthorizedError);
     }
 
-    const payload = jwt.verify(token, jwtSecret);
-
+    const payload = await jwt.verify(token, jwtSecret);
     req.user = payload;
 
-    next();
+    return next();
   } catch (error) {
-    next(error);
+    const unauthorizedError = new UnauthorizedError('Неверный токен');
+    return next(unauthorizedError);
   }
-
-  return undefined;
 };
 
 module.exports = auth;

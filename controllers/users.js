@@ -17,13 +17,11 @@ const ConflictError = require('../errors/ConflictError');
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    res.status(HTTP_STATUS_OK).json(users);
+    return res.status(HTTP_STATUS_OK).json(users);
   } catch (error) {
     const internalError = new InternalServerError('Ошибка на сервере');
     return next(internalError);
   }
-
-  return undefined;
 };
 
 // ф-я получения пользователя по id
@@ -34,12 +32,10 @@ const getUserById = async (req, res, next) => {
       const notFoundError = new NotFoundError('Пользователь по указанному _id не найден');
       return next(notFoundError);
     }
-    res.status(HTTP_STATUS_OK).json(user);
+    return res.status(HTTP_STATUS_OK).json(user);
   } catch (error) {
-    next(error);
+    return next(error);
   }
-
-  return undefined;
 };
 
 // ф-я создания нового пользователя
@@ -69,17 +65,15 @@ const createUser = async (req, res, next) => {
       password: hashedPassword,
     });
     await user.save();
-    res.status(HTTP_STATUS_CREATED).json({
+    return res.status(HTTP_STATUS_CREATED).json({
       name: user.name,
       about: user.about,
       avatar: user.avatar,
       email: user.email,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
-
-  return undefined;
 };
 
 // Функция для унификации метода findByIdAnUpdate
@@ -93,12 +87,10 @@ const updateUser = async (req, res, next, updateData) => {
       const notFoundError = new NotFoundError('Пользователь с указанным _id не найден.');
       return next(notFoundError);
     }
-    res.status(200).json(updatedUser);
+    return res.status(200).json(updatedUser);
   } catch (error) {
-    next(error);
+    return next(error);
   }
-
-  return undefined;
 };
 
 // Функция для обновления профиля
@@ -129,17 +121,15 @@ const login = async (req, res, next) => {
 
     const token = jwt.sign({ _id: user._id }, jwtSecret, { expiresIn: '7d' });
 
-    res.cookie('jwt', token, {
+    return res.cookie('jwt', token, {
       httpOnly: true,
       sameSite: true,
       maxAge: 3600000 * 24 * 7,
       secure: process.env.NODE_ENV === 'production',
     }).status(HTTP_STATUS_OK).json({ message: 'Вы успешно авторизировались!' });
   } catch (error) {
-    next(error);
+    return next(error);
   }
-
-  return undefined;
 };
 
 const getUserInfo = async (req, res, next) => {
@@ -153,12 +143,10 @@ const getUserInfo = async (req, res, next) => {
     const userData = user.toObject();
     delete userData.password;
 
-    res.status(HTTP_STATUS_OK).json(userData);
+    return res.status(HTTP_STATUS_OK).json(userData);
   } catch (error) {
-    next(error);
+    return next(error);
   }
-
-  return undefined;
 };
 
 module.exports = {
