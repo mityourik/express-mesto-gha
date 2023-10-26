@@ -8,23 +8,6 @@ const InternalServerError = require('../errors/InternalServerError');
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
 
-const handleCardRequest = async (req, res, next, requestFunc, errorMessage) => {
-  try {
-    const { cardId } = req.params;
-    const result = await requestFunc(cardId);
-
-    if (!result) {
-      const notFoundError = new NotFoundError(errorMessage);
-      return next(notFoundError);
-    }
-
-    return res.status(HTTP_STATUS_OK).json(result);
-  } catch (error) {
-    const internalError = new InternalServerError(errorMessage);
-    return next(internalError);
-  }
-};
-
 const getAllCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
@@ -68,32 +51,30 @@ const deleteCard = async (req, res, next) => {
     }
 
     await Card.findByIdAndDelete(cardId);
-    return res.status(HTTP_STATUS_OK).json({ message: 'Карточка удалена' });
+    return res.status(HTTP_STATUS_OK).json(card);
   } catch (error) {
     const internalError = new InternalServerError('На сервере произошла ошибка');
     return next(internalError);
   }
 };
 
-const likeCard = async (req, res, next) => {
-  const requestFunc = (cardId) => Card.findByIdAndUpdate(
-    cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  );
-  const errorMessage = 'Передан несуществующий _id карточки.';
-  handleCardRequest(req, res, next, requestFunc, errorMessage);
+const updateLike = async (req, res, next, method) => {
+  try {
+    const { cardId } = req.params;
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { [method]: { likes: req.user._id } },
+      { new: true },
+    ).orFail(new NotFoundError('Нет карточки по данному id'));
+
+    res.send(card);
+  } catch (error) {
+    next(error);
+  }
 };
 
-const dislikeCard = async (req, res, next) => {
-  const requestFunc = (cardId) => Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  );
-  const errorMessage = 'Передан несуществующий _id карточки.';
-  handleCardRequest(req, res, next, requestFunc, errorMessage);
-};
+const likeCard = (req, res, next) => updateLike(req, res, next, '$addToSet');
+const dislikeCard = (req, res, next) => updateLike(req, res, next, '$pull');
 
 module.exports = {
   getAllCards,
