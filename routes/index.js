@@ -8,8 +8,8 @@ const { createUserSchema, loginSchema } = require('../validationSchemas/joiValid
 
 const router = Router();
 
-router.post('/signup', createUserSchema, createUser);
-router.post('/signin', loginSchema, login);
+router.post('signup', createUserSchema, createUser);
+router.post('signin', loginSchema, login);
 
 router.use(auth);
 
