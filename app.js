@@ -10,7 +10,7 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.use(cors({ origin: ['https://mityourik.nomoredomainsrocks.ru'], credentials: true }));
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001', 'https://mityourik.nomoredomainsrocks.ru', 'https://api.mityourik.nomoredomainsrocks.ru'], credentials: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
